@@ -15,8 +15,6 @@
 // D2: xx
 // D3: xx
 
-#include <Arduino.h>
-
 // put function declarations here:
 int myFunction(int, int);
 
