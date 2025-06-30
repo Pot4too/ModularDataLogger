@@ -289,5 +289,15 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "cmake.sourceDirectory": "/Users/alex/Library/CloudStorage/OneDrive-Personal/PersonalProjects/ModularEnvironmentalLogger/lib/Adafruit_SSD1306"
+  "cmake.sourceDirectory": "/Users/alex/Library/CloudStorage/OneDrive-Personal/PersonalProjects/ModularEnvironmentalLogger/lib/Adafruit_SSD1306",
+  "files.associations": {
+    "array": "cpp",
+    "deque": "cpp",
+    "string": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp",
+    "vector": "cpp",
+    "string_view": "cpp",
+    "initializer_list": "cpp"
+  }
 }
