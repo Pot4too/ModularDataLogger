@@ -11,6 +11,7 @@ public:
     virtual const void *getData() const = 0;
     bool isValid() { return isValid_Bool; }
     virtual ~GenericI2CSensorBase() {};
+    virtual Config::I2CSensorType getSensorType() const { return Config::I2CSensorType::None; }
 
 protected:
     bool isValid_Bool = false;

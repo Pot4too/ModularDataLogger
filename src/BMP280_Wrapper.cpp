@@ -1,10 +1,8 @@
-#include <BMP280_Wrapper.h>
+#include "BMP280_Wrapper.h"
 
-bool BMP280_Wrapper::begin(uint8_t _i2cAddress, TwoWire &_wire)
+bool BMP280_Wrapper::begin()
 {
-    i2cAddress = _i2cAddress;
-    *wire = _wire;
-    sensor = Adafruit_BMP280(&_wire);
+    sensor = Adafruit_BMP280(wire);
     if (!sensor.begin(i2cAddress))
     {
         DEBUG_PRINTLN("BMP280 sensor initialization failed.");

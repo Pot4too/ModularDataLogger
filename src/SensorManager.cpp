@@ -1,8 +1,8 @@
-#include <SensorManager.h>
+#include "SensorManager.h"
 
 bool SensorManager::beginAll()
 {
-    if (!wire->begin(Config::I2C_SDA_PIN, Config::I2C_SCL_PIN))
+    if (!mainWire->begin(Config::I2C_SDA_PIN, Config::I2C_SCL_PIN))
     {
         DEBUG_PRINTLN("Failed to initialize I2C Wire.");
         return false;
@@ -48,8 +48,8 @@ bool SensorManager::beginI2CSensors()
     DEBUG_PRINTLN("Starting I2C scanner");
     for (uint8_t i = 0; i < 127; i++)
     {
-        wire->beginTransmission(i);
-        if (!wire->endTransmission() == 0)
+        mainWire->beginTransmission(i);
+        if (!mainWire->endTransmission() == 0)
         {
             DEBUG_PRINT("No device found at address 2x");
             DEBUG_PRINTLN(i);
@@ -64,8 +64,14 @@ bool SensorManager::beginI2CSensors()
             switch (Config::I2CSensorTable[j].type)
             {
             case Config::I2CSensorType::BMP280:
-                i2cSensors[numberOfInitializedI2CSensors] = new BMP280_Wrapper;
-                i2cSensors[numberOfInitializedI2CSensors]->begin(i2cAddress, &wire);
+                i2cSensors[numberOfInitializedI2CSensors] = new BMP280_Wrapper(Config::I2CSensorTable[j].address, *mainWire);
+                if (!i2cSensors[numberOfInitializedI2CSensors]->begin())
+                {
+                    DEBUG_PRINTLN("Failed to initialize BMP280 sensor at address 0x" + String(i, HEX));
+                    delete i2cSensors[numberOfInitializedI2CSensors];
+                    i2cSensors[numberOfInitializedI2CSensors] = nullptr;
+                    continue;
+                }
                 numberOfInitializedI2CSensors++;
                 break;
             case Config::I2CSensorType::None:
@@ -77,5 +83,103 @@ bool SensorManager::beginI2CSensors()
             }
         }
     }
+    return true;
+}
+
+bool SensorManager::updateI2CSensors()
+{
+    for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
+    {
+        if (i2cSensors[i] == nullptr)
+            continue;
+        if (!i2cSensors[i]->update())
+        {
+            DEBUG_PRINTLN("Failed to update sensor: " + String(i2cSensors[i]->getSensorName()));
+        }
+    }
+    return true;
+}
+
+void SensorManager::testBMP280()
+{
+    for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
+    {
+        if (i2cSensors[i] == nullptr)
+            continue;
+        if (strcmp(i2cSensors[i]->getSensorName(), "BMP280") == 0)
+        {
+            const auto *dataBMP280 = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
+
+            DEBUG_PRINT("BMP280 Sensor Data: ");
+            DEBUG_PRINT("Temperature: ");
+            DEBUG_PRINT(dataBMP280->temperature);
+            DEBUG_PRINT(" °C, Pressure: ");
+            DEBUG_PRINT(dataBMP280->pressure);
+            DEBUG_PRINT(" hPa, Altitude: ");
+            DEBUG_PRINT(dataBMP280->altitude);
+            DEBUG_PRINTLN(" m");
+        }
+        switch (i2cSensors[i]->getSensorType())
+        {
+        case Config::I2CSensorType::BMP280:
+            const auto *internalData = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
+
+            DEBUG_PRINT("BMP280 Sensor Data: ");
+            DEBUG_PRINT("Temperature: ");
+            DEBUG_PRINT(internalData->temperature);
+            DEBUG_PRINT(" °C, Pressure: ");
+            DEBUG_PRINT(internalData->pressure);
+            DEBUG_PRINT(" hPa, Altitude: ");
+            DEBUG_PRINT(internalData->altitude);
+            DEBUG_PRINTLN(" m");
+            break;
+
+        case Config::I2CSensorType::AHT20:
+            const auto *internalData = static_cast<const AHT20_Wrapper::Data *>(i2cSensors[i]->getData());
+
+            DEBUG_PRINT("AHT20 Sensor Data: ");
+            DEBUG_PRINT("Temperature: ");
+            DEBUG_PRINT(internalData->temperature);
+            DEBUG_PRINT(" °C, Humidity: ");
+            DEBUG_PRINT(internalData->humidity);
+            DEBUG_PRINTLN(" % RH");
+            break;
+        case Config::I2CSensorType::None:
+        default:
+            DEBUG_PRINTLN("Unknown sensor type, cannot validate.");
+            break;
+        }
+
+        // if (!sensorManager.updateAll())
+        // {
+        //     DEBUG_PRINTLN("Sensor Manager update failed.");
+        // }
+        // DEBUG_PRINTLN("Sensor Manager update successful.");
+        // if (!sensorManager.i2cSensors[0]->isValid())
+        // {
+        //     DEBUG_PRINTLN("BMP280 sensor is not valid.");
+        //     continue;
+        // }
+        // dataBMP280 = sensorManager.i2cSensors[0]->getData();
+        // DEBUG_PRINT("BMP280 Sensor Data: ");
+        // DEBUG_PRINT("Temperature: ");
+        // DEBUG_PRINT(dataBMP280->temperature);
+        // DEBUG_PRINT(" °C, Pressure: ");
+        // DEBUG_PRINT(dataBMP280->pressure);
+        // DEBUG_PRINT(" hPa, Altitude: ");
+        // DEBUG_PRINT(dataBMP280->altitude);
+        // DEBUG_PRINTLN(" m");
+
+        // DEBUG_PRINTLN("Loop iteration complete.");
+    }
+}
+
+bool SensorManager::beginAnalogSensors()
+{
+    return true;
+}
+
+bool SensorManager::updateAnalogSensors()
+{
     return true;
 }

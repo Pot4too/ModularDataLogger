@@ -1,6 +1,6 @@
 #pragma once
-#include <config.h>
-#include <GenericSensorBase.h>
+#include "config.h"
+#include "GenericSensorBase.h"
 #include <Adafruit_BMP280.h>
 
 class BMP280_Wrapper : public GenericI2CSensorBase
@@ -12,16 +12,23 @@ public:
         float pressure = NAN;
         float altitude = NAN;
     };
-    bool begin(uint8_t _i2cAddress, TwoWire &_wire);
-    bool update();
-    const char *getSensorName()
+
+    BMP280_Wrapper(int8_t _i2cAddress, TwoWire &_wire)
+    {
+        i2cAddress = _i2cAddress;
+        wire = &_wire;
+    }
+    bool begin() override;
+    bool update() override;
+    const char *getSensorName() const override
     {
         return "BMP280";
     }
-    const void *getData()
+    const void *getData() const override
     {
         return &data;
     }
+    Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::BMP280; }
 
 private:
     void setSampling();
