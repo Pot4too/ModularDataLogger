@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 // comment out '#define DEBUG at the top of the config.h file' to disable debug mode
 #define DEBUG
@@ -43,7 +44,7 @@ namespace Config
      * @brief  Structure representing an analog sensor.
      * This structure contains the pin number and type of the analog sensor.
      */
-    Struct AnalogSensor[]
+    struct AnalogSensor
     {
         uint8_t pin;
         AnalogSensorType type;
@@ -57,9 +58,11 @@ namespace Config
     constexpr AnalogSensor AnalogSensorTable[] = {
         {36, AnalogSensorType::CapacitiveMoisture},
         {39, AnalogSensorType::MAX4466},
-        {-1, AnalogSensorType::None},
-        {-1, AnalogSensorType::None},
-        {-1, AnalogSensorType::None}};
+        {0, AnalogSensorType::None},
+        {0, AnalogSensorType::None},
+        {0, AnalogSensorType::None}};
+
+    constexpr uint8_t AnalogSensorCount = sizeof(AnalogSensorTable) / sizeof(AnalogSensorTable[0]);
 
     //! I2C Setup
     //* I2C Wire pins
@@ -83,7 +86,7 @@ namespace Config
      * @brief Structure representing an I2C sensor.
      * This structure contains the I2C address and type of the sensor.
      */
-    Struct I2CSensor
+    struct I2CSensor
     {
         uint8_t address;
         I2CSensorType type;
@@ -99,6 +102,9 @@ namespace Config
         {0x38, I2CSensorType::AHT20},
         {0x68, I2CSensorType::MPU6050},
         {0x23, I2CSensorType::BH1750}};
+
+    constexpr uint8_t numberOfKnownI2CSensors = sizeof(I2CSensorTable) / sizeof(I2CSensorTable[0]);
+    constexpr uint8_t maxI2CSensors = 10;
 
     // Sealevel pressure in hPa
     constexpr float SEA_LEVEL_PRESSURE_HPA = 1013.25f;

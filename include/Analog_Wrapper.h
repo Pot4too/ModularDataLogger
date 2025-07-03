@@ -2,14 +2,6 @@
 #include <config.h>
 #include <Arduino.h>
 
-typedef enum
-{
-    CapacitiveMoisture, // Capacitive Moisture Sensor
-    MQ135,              // Air quality sensor
-    MAX4466,            // Microphone sensor
-    GenericAnalog       // Generic analog sensor
-} AnalogSensorType;
-
 class Analog_Wrapper
 {
 public:

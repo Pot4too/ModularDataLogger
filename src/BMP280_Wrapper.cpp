@@ -1,34 +1,33 @@
 #include <BMP280_Wrapper.h>
 
-/**
- * @brief Initializes the BMP280 sensor.
- *
- * @param address The I2C address of the BMP280 sensor, default is 0x76.
- * @return true if initialization is successful, false otherwise.
- */
-bool BMP280_Wrapper::begin(uint8_t address)
+bool BMP280_Wrapper::begin(uint8_t _i2cAddress, TwoWire &_wire)
 {
-    if (!bmp.begin(address))
+    i2cAddress = _i2cAddress;
+    *wire = _wire;
+    sensor = Adafruit_BMP280(&_wire);
+    if (!sensor.begin(i2cAddress))
+    {
+        DEBUG_PRINTLN("BMP280 sensor initialization failed.");
         return false;
-    BMP280_Wrapper::bmp.setSampling();
+    }
+    setSampling();
+    isValid_Bool = true;
     return true;
 }
 
-/**
- * @brief Reads data from the BMP280 sensor.
- *
- * @return SensorData_BMP280 struct with validity check.
- */
-SensorData_BMP280 BMP280_Wrapper::read()
+bool BMP280_Wrapper::update()
 {
-    SensorData_BMP280 data;
-    if (!bmp.takeForcedMeasurement())
-        return data; // Return invalid data if measurement fails
-    data.temperature = bmp.readTemperature();
-    data.pressure = bmp.readPressure() / 100.0F;        // Convert pressure to hPa
-    data.altitude = bmp.readAltitude(seaLevelPressure); // Calculate altitude based on sea level pressure
-    data.valid = true;                                  // Mark data as valid
-    return data;
+    if (!BMP280_Wrapper::sensor.takeForcedMeasurement())
+    {
+        DEBUG_PRINTLN("Failed to take forced measurement from BMP280.");
+        isValid_Bool = false;
+        return false; // Return false if measurement fails
+    }
+    data.temperature = sensor.readTemperature();
+    data.pressure = sensor.readPressure() / 100.0F;
+    data.altitude = sensor.readAltitude(Config::SEA_LEVEL_PRESSURE_HPA);
+    isValid_Bool = true;
+    return true;
 }
 
 /**
@@ -38,9 +37,9 @@ SensorData_BMP280 BMP280_Wrapper::read()
  */
 void BMP280_Wrapper::setSampling()
 {
-    BMP280_Wrapper::bmp.setSampling(Adafruit_BMP280::MODE_FORCED,     // Operating Mode
-                                    Adafruit_BMP280::SAMPLING_X16,    // Temperature sampling
-                                    Adafruit_BMP280::SAMPLING_X16,    // Pressure sampling
-                                    Adafruit_BMP280::FILTER_X16,      // Filtering
-                                    Adafruit_BMP280::STANDBY_MS_500); // Standby time
+    sensor.setSampling(Adafruit_BMP280::MODE_FORCED,     // Operating Mode
+                       Adafruit_BMP280::SAMPLING_X16,    // Temperature sampling
+                       Adafruit_BMP280::SAMPLING_X16,    // Pressure sampling
+                       Adafruit_BMP280::FILTER_X16,      // Filtering
+                       Adafruit_BMP280::STANDBY_MS_500); // Standby time
 }

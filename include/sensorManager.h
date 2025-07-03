@@ -1,17 +1,32 @@
 #pragma once
 #include <config.h>
+#include <GenericSensorBase.h>
 #include <Wire.h>
-#include <AHT20_Wrapper.h>
-#include <Analog_Wrapper.h>
-#include <BMP280_Wrapper.h>
-#include <MPU6050_Wrapper.h>
 
-Class SensorManager
+//* Sensor wrappers
+#include <BMP280_Wrapper.h>
+// #include <AHT20_Wrapper.h>
+// #include <Analog_Wrapper.h>
+// #include <MPU6050_Wrapper.h>
+
+class SensorManager
 {
 public:
-    bool begin();
+    bool beginAll();
+    bool updateAll();
+    TwoWire &getI2CWire()
+    {
+        return *wire;
+    }
 
 private:
-    bool initAnalogSensors();
-    bool initI2cSensors();
-}
+    bool beginAnalogSensors();
+    bool beginI2CSensors();
+    bool updateAnalogSensors();
+    bool updateI2CSensors();
+
+    TwoWire *wire = nullptr;
+
+    uint8_t numberOfInitializedI2CSensors = 0;
+    GenericI2CSensorBase *i2cSensors[Config::maxI2CSensors] = {nullptr};
+};
