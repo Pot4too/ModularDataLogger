@@ -41,3 +41,19 @@ void BMP280_Wrapper::setSampling()
                        Adafruit_BMP280::FILTER_X16,      // Filtering
                        Adafruit_BMP280::STANDBY_MS_500); // Standby time
 }
+
+const void BMP280_Wrapper::debugPrintData() const
+{
+    DEBUG_PRINT("BMP280 Sensor Data: ");
+    DEBUG_PRINT("Temperature: ");
+    DEBUG_PRINT(data.temperature);
+    DEBUG_PRINT(" °C, Pressure: ");
+    DEBUG_PRINT(data.pressure);
+    DEBUG_PRINT(" hPa, Altitude: ");
+    DEBUG_PRINT(data.altitude);
+    DEBUG_PRINTLN(" m");
+    DEBUG_PRINTLN("Sensor data is valid: " + String(isValid_Bool ? "true" : "false"));
+    DEBUG_PRINTLN("Sensor I2C Address: 0x" + String(i2cAddress, HEX));
+    DEBUG_PRINTLN("Sensor Type: " + String(getSensorType() == Config::I2CSensorType::BMP280 ? "BMP280" : "Unknown"));
+    DEBUG_PRINTLN("Sensor Name: " + String(getSensorName()));
+}

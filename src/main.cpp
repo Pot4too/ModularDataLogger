@@ -22,8 +22,8 @@ void setup()
     }
 
     DEBUG_PRINTLN("Sensor Manager initialized successfully.");
-    sensorManager.updateAll();
-    // DEBUG_PRINTLN(testingData.temperature);
+    // sensorManager.updateAll();
+    //  DEBUG_PRINTLN(testingData.temperature);
 }
 
 void loop()
@@ -34,5 +34,5 @@ void loop()
         DEBUG_PRINTLN("Sensor Manager update failed.");
         return;
     }
-    sensorManager.testBMP280();
+    sensorManager.testI2CSensors();
 }

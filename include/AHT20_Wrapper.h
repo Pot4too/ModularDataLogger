@@ -23,6 +23,7 @@ public:
     const char *getSensorName() const override { return "AHT20"; }
     const void *getData() const override { return &data; }
     Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::AHT20; }
+    const void debugPrintData() const override;
 
 private:
     AHT20 sensor;

@@ -30,3 +30,17 @@ bool AHT20_Wrapper::update()
     isValid_Bool = true;
     return true;
 }
+
+const void AHT20_Wrapper::debugPrintData() const
+{
+    DEBUG_PRINT("AHT20 Sensor Data: ");
+    DEBUG_PRINT("Temperature: ");
+    DEBUG_PRINT(data.temperature);
+    DEBUG_PRINT(" °C, Humidity: ");
+    DEBUG_PRINT(data.humidity);
+    DEBUG_PRINTLN(" % RH");
+    DEBUG_PRINTLN("Sensor data is valid: " + String(isValid_Bool ? "true" : "false"));
+    DEBUG_PRINTLN("Sensor I2C Address: 0x" + String(i2cAddress, HEX));
+    DEBUG_PRINTLN("Sensor Type: " + String(getSensorType() == Config::I2CSensorType::AHT20 ? "AHT20" : "Unknown"));
+    DEBUG_PRINTLN("Sensor Name: " + String(getSensorName()));
+}

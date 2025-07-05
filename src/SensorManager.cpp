@@ -107,12 +107,14 @@ bool SensorManager::updateI2CSensors()
         if (!i2cSensors[i]->update())
         {
             DEBUG_PRINTLN("Failed to update sensor: " + String(i2cSensors[i]->getSensorName()));
+            continue;
         }
+        // function to log data to sd card
     }
     return true;
 }
 
-void SensorManager::testBMP280()
+void SensorManager::testI2CSensors()
 {
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
@@ -125,77 +127,7 @@ void SensorManager::testBMP280()
             DEBUG_PRINTLN(" is not valid, skipping data retrieval.");
             continue;
         }
-        // if (strcmp(i2cSensors[i]->getSensorName(), "BMP280") == 0)
-        // {
-        //     const auto *dataBMP280 = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
-
-        //     DEBUG_PRINT("BMP280 Sensor Data: ");
-        //     DEBUG_PRINT("Temperature: ");
-        //     DEBUG_PRINT(dataBMP280->temperature);
-        //     DEBUG_PRINT(" °C, Pressure: ");
-        //     DEBUG_PRINT(dataBMP280->pressure);
-        //     DEBUG_PRINT(" hPa, Altitude: ");
-        //     DEBUG_PRINT(dataBMP280->altitude);
-        //     DEBUG_PRINTLN(" m");
-        // }
-        switch (i2cSensors[i]->getSensorType())
-        {
-        case Config::I2CSensorType::BMP280:
-        {
-            const auto *internalData = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
-
-            DEBUG_PRINT("BMP280 Sensor Data: ");
-            DEBUG_PRINT("Temperature: ");
-            DEBUG_PRINT(internalData->temperature);
-            DEBUG_PRINT(" °C, Pressure: ");
-            DEBUG_PRINT(internalData->pressure);
-            DEBUG_PRINT(" hPa, Altitude: ");
-            DEBUG_PRINT(internalData->altitude);
-            DEBUG_PRINTLN(" m");
-            break;
-        }
-
-        case Config::I2CSensorType::AHT20:
-        {
-            const auto *internalData = static_cast<const AHT20_Wrapper::Data *>(i2cSensors[i]->getData());
-
-            DEBUG_PRINT("AHT20 Sensor Data: ");
-            DEBUG_PRINT("Temperature: ");
-            DEBUG_PRINT(internalData->temperature);
-            DEBUG_PRINT(" °C, Humidity: ");
-            DEBUG_PRINT(internalData->humidity);
-            DEBUG_PRINTLN(" % RH");
-            break;
-        }
-        case Config::I2CSensorType::None:
-            DEBUG_PRINTLN("No sensor type selected for this I2C address in config!");
-            break;
-        default:
-            DEBUG_PRINTLN("Unknown sensor type, cannot validate.");
-            break;
-        }
-
-        // if (!sensorManager.updateAll())
-        // {
-        //     DEBUG_PRINTLN("Sensor Manager update failed.");
-        // }
-        // DEBUG_PRINTLN("Sensor Manager update successful.");
-        // if (!sensorManager.i2cSensors[0]->isValid())
-        // {
-        //     DEBUG_PRINTLN("BMP280 sensor is not valid.");
-        //     continue;
-        // }
-        // dataBMP280 = sensorManager.i2cSensors[0]->getData();
-        // DEBUG_PRINT("BMP280 Sensor Data: ");
-        // DEBUG_PRINT("Temperature: ");
-        // DEBUG_PRINT(dataBMP280->temperature);
-        // DEBUG_PRINT(" °C, Pressure: ");
-        // DEBUG_PRINT(dataBMP280->pressure);
-        // DEBUG_PRINT(" hPa, Altitude: ");
-        // DEBUG_PRINT(dataBMP280->altitude);
-        // DEBUG_PRINTLN(" m");
-
-        // DEBUG_PRINTLN("Loop iteration complete.");
+        i2cSensors[i]->debugPrintData();
     }
 }
 

@@ -25,6 +25,7 @@ namespace Config
     constexpr int SPI_MISO_PIN = 19;
     constexpr int SPI_SCK_PIN = 18;
     constexpr int SD_CS_PIN = 5; // SD ChipSelect pin
+    constexpr int SPI_Frequency = 4000000;
 
     //! Analog Setup
     /**

@@ -18,7 +18,7 @@ public:
     {
         return *mainWire;
     }
-    void testBMP280();
+    void testI2CSensors();
 
 private:
     bool beginAnalogSensors();

@@ -1,8 +1,9 @@
 #pragma once
 #include <Wire.h>
 #include <stdint.h>
+#include "dataLogger.h"
 
-class GenericI2CSensorBase
+class GenericI2CSensorBase : public GenericSensorLogger
 {
 public:
     virtual bool begin() = 0;
@@ -12,6 +13,7 @@ public:
     bool isValid() { return isValid_Bool; }
     virtual ~GenericI2CSensorBase() {};
     virtual Config::I2CSensorType getSensorType() const { return Config::I2CSensorType::None; }
+    virtual const void debugPrintData() const;
 
 protected:
     bool isValid_Bool = false;
