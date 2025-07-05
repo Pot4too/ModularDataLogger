@@ -25,8 +25,13 @@ public:
     Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::BMP280; }
     const void debugPrintData() const override;
 
+    bool logDataToSd(File *dataFile) override;
+    void createNameHeader(File *dataFile) override;
+    void createDataTypesHeader(File *dataFile) override;
+
 private:
     void setSampling();
     Adafruit_BMP280 sensor; // Create an instance of the BMP280 sensor
     Data data;
+    const uint8_t numberOfUniqueData() const override { return 3; } // Number of data variables in data struct
 };

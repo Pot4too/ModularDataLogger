@@ -44,3 +44,21 @@ const void AHT20_Wrapper::debugPrintData() const
     DEBUG_PRINTLN("Sensor Type: " + String(getSensorType() == Config::I2CSensorType::AHT20 ? "AHT20" : "Unknown"));
     DEBUG_PRINTLN("Sensor Name: " + String(getSensorName()));
 }
+
+bool AHT20_Wrapper::logDataToSd(File *dataFile)
+{
+}
+
+void AHT20_Wrapper::createNameHeader(File *dataFile)
+{
+    for (int i = 0; i < numberOfUniqueData(); i++)
+    {
+        dataFile->print("AHT20");
+        if (i != numberOfUniqueData())
+            dataFile->print(",");
+    }
+}
+
+void AHT20_Wrapper::createDataTypesHeader(File *dataFile)
+{
+}

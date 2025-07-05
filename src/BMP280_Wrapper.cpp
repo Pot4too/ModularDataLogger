@@ -57,3 +57,21 @@ const void BMP280_Wrapper::debugPrintData() const
     DEBUG_PRINTLN("Sensor Type: " + String(getSensorType() == Config::I2CSensorType::BMP280 ? "BMP280" : "Unknown"));
     DEBUG_PRINTLN("Sensor Name: " + String(getSensorName()));
 }
+
+bool BMP280_Wrapper::logDataToSd(File *dataFile)
+{
+}
+
+void BMP280_Wrapper::createNameHeader(File *dataFile)
+{
+    for (int i = 0; i < numberOfUniqueData(); i++)
+    {
+        dataFile->print("BMP280");
+        if (i != numberOfUniqueData())
+            dataFile->print(",");
+    }
+}
+
+void BMP280_Wrapper::createDataTypesHeader(File *dataFile)
+{
+}

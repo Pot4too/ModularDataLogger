@@ -25,7 +25,12 @@ public:
     Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::AHT20; }
     const void debugPrintData() const override;
 
+    bool logDataToSd(File *dataFile) override;
+    void createNameHeader(File *dataFile) override;
+    void createDataTypesHeader(File *dataFile) override;
+
 private:
     AHT20 sensor;
     Data data;
+    const uint8_t numberOfUniqueData() const override { return 2; }
 };

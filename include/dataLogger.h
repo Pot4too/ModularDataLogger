@@ -2,13 +2,17 @@
 #include "config.h"
 #include <SD.h>
 #include <SPI.h>
+#include <string.h>
 
 class GenericSensorLogger
 {
 public:
     virtual bool logDataToSd(File *dataFile);
+    virtual void createNameHeader(File *dataFile);
+    virtual void createDataTypesHeader(File *dataFile);
 
 protected:
+    virtual const uint8_t numberOfUniqueData() const { return 0; }
 };
 
 class DataLogger
@@ -20,22 +24,21 @@ public:
     }
     bool begin();
     bool createNewLogFile(uint16_t index);
-    void createHeader();
-    File *getDataFile()
-    {
-        return &dataFile;
-    }
-    void debugPrintCardInfo() const;
+    void endRow();
+    const void debugPrintCardInfo() const;
     File *openFile();
     const bool isFileOpen() const
     {
-        return &fileIsOpen;
+        return fileIsOpen;
     }
 
 private:
     uint16_t determineNewLogIndex();
-    string filePath;
-    SPIClass *internalSPI;
-    // File dataFile;
+    String filePath;
+    SPIClass internalSPI;
+    File dataFile;
     bool fileIsOpen = false;
+
+    String baseName = "/log_";
+    String fileExtension = ".csv";
 };

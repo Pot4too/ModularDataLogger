@@ -21,7 +21,7 @@ protected:
     uint8_t i2cAddress = 0;
 };
 
-class GenericAnalogSensorBase
+class GenericAnalogSensorBase : public GenericSensorLogger
 {
 public:
 };
