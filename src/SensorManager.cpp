@@ -70,10 +70,22 @@ bool SensorManager::beginI2CSensors()
                     DEBUG_PRINTLN("Failed to initialize BMP280 sensor at address 0x" + String(i, HEX));
                     delete i2cSensors[numberOfInitializedI2CSensors];
                     i2cSensors[numberOfInitializedI2CSensors] = nullptr;
-                    continue;
+                    break;
                 }
                 numberOfInitializedI2CSensors++;
                 break;
+            case Config::I2CSensorType::AHT20:
+                i2cSensors[numberOfInitializedI2CSensors] = new AHT20_Wrapper(Config::I2CSensorTable[j].address, *mainWire);
+                if (!i2cSensors[numberOfInitializedI2CSensors]->begin())
+                {
+                    DEBUG_PRINTLN("Failed to initialize AHT20 sensor at address 0x" + String(i, HEX));
+                    delete i2cSensors[numberOfInitializedI2CSensors];
+                    i2cSensors[numberOfInitializedI2CSensors] = nullptr;
+                    break;
+                }
+                numberOfInitializedI2CSensors++;
+                break;
+
             case Config::I2CSensorType::None:
                 DEBUG_PRINTLN("No sensor type defined for this address, skipping initialization.");
                 break;
@@ -106,22 +118,30 @@ void SensorManager::testBMP280()
     {
         if (i2cSensors[i] == nullptr)
             continue;
-        if (strcmp(i2cSensors[i]->getSensorName(), "BMP280") == 0)
+        if (i2cSensors[i]->isValid() == false)
         {
-            const auto *dataBMP280 = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
-
-            DEBUG_PRINT("BMP280 Sensor Data: ");
-            DEBUG_PRINT("Temperature: ");
-            DEBUG_PRINT(dataBMP280->temperature);
-            DEBUG_PRINT(" °C, Pressure: ");
-            DEBUG_PRINT(dataBMP280->pressure);
-            DEBUG_PRINT(" hPa, Altitude: ");
-            DEBUG_PRINT(dataBMP280->altitude);
-            DEBUG_PRINTLN(" m");
+            DEBUG_PRINT("Sensor ");
+            DEBUG_PRINT(i2cSensors[i]->getSensorName());
+            DEBUG_PRINTLN(" is not valid, skipping data retrieval.");
+            continue;
         }
+        // if (strcmp(i2cSensors[i]->getSensorName(), "BMP280") == 0)
+        // {
+        //     const auto *dataBMP280 = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
+
+        //     DEBUG_PRINT("BMP280 Sensor Data: ");
+        //     DEBUG_PRINT("Temperature: ");
+        //     DEBUG_PRINT(dataBMP280->temperature);
+        //     DEBUG_PRINT(" °C, Pressure: ");
+        //     DEBUG_PRINT(dataBMP280->pressure);
+        //     DEBUG_PRINT(" hPa, Altitude: ");
+        //     DEBUG_PRINT(dataBMP280->altitude);
+        //     DEBUG_PRINTLN(" m");
+        // }
         switch (i2cSensors[i]->getSensorType())
         {
         case Config::I2CSensorType::BMP280:
+        {
             const auto *internalData = static_cast<const BMP280_Wrapper::Data *>(i2cSensors[i]->getData());
 
             DEBUG_PRINT("BMP280 Sensor Data: ");
@@ -133,8 +153,10 @@ void SensorManager::testBMP280()
             DEBUG_PRINT(internalData->altitude);
             DEBUG_PRINTLN(" m");
             break;
+        }
 
         case Config::I2CSensorType::AHT20:
+        {
             const auto *internalData = static_cast<const AHT20_Wrapper::Data *>(i2cSensors[i]->getData());
 
             DEBUG_PRINT("AHT20 Sensor Data: ");
@@ -144,7 +166,10 @@ void SensorManager::testBMP280()
             DEBUG_PRINT(internalData->humidity);
             DEBUG_PRINTLN(" % RH");
             break;
+        }
         case Config::I2CSensorType::None:
+            DEBUG_PRINTLN("No sensor type selected for this I2C address in config!");
+            break;
         default:
             DEBUG_PRINTLN("Unknown sensor type, cannot validate.");
             break;

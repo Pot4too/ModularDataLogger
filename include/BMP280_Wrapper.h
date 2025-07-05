@@ -20,14 +20,8 @@ public:
     }
     bool begin() override;
     bool update() override;
-    const char *getSensorName() const override
-    {
-        return "BMP280";
-    }
-    const void *getData() const override
-    {
-        return &data;
-    }
+    const char *getSensorName() const override { return "BMP280"; }
+    const void *getData() const override { return &data; }
     Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::BMP280; }
 
 private:

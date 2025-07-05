@@ -1,28 +1,32 @@
-#include <AHT20_Wrapper.h>
+#include "AHT20_Wrapper.h"
 
 /**
- * @brief Initializes the AHT20 sensor.
+ * @brief Initializes AHT20 sensor
  *
- * @param wire Reference to the TwoWire object for I2C communication.
- * @param address I2C address of the AHT20 sensor (default is 0x38).
- * @return true if initialization is successful, false otherwise.
+ * @return true if AHT20 initialized correctly, false otherwise
  */
-bool AHT20_Wrapper::begin(TwoWire &wire, uint8_t address)
+bool AHT20_Wrapper::begin()
 {
-    AHT20 aht(address); // Initialize AHT20 with the default address
-    return aht.begin();
+    return sensor.begin();
 }
 
 /**
  * @brief Reads temperature and humidity from the AHT20 sensor.
  *
- * @return SensorData_AHT20 structure containing temperature, humidity, and validity flag.
+ * @return True if data updated succesfully, false otherwise
  */
-SensorData_AHT20 AHT20_Wrapper::read()
+bool AHT20_Wrapper::update()
 {
-    SensorData_AHT20 data;
-    data.temperature = aht.getTemperature();
-    data.humidity = aht.getHumidity();
-    data.valid = !isnan(data.temperature) && !isnan(data.humidity);
-    return data;
+    data.temperature = sensor.getTemperature();
+    data.humidity = sensor.getHumidity();
+    bool temperatureIsValid = data.temperature < -40 || data.temperature > 86;
+    bool humidityIsValid = data.humidity < 0 || data.humidity > 100;
+    if (temperatureIsValid || humidityIsValid)
+    {
+        DEBUG_PRINTLN("AHT20_Wrapper.h update() failed");
+        isValid_Bool = false;
+        return false;
+    }
+    isValid_Bool = true;
+    return true;
 }

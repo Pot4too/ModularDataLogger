@@ -5,7 +5,7 @@
 
 //* Sensor wrappers
 #include "BMP280_Wrapper.h"
-// #include <AHT20_Wrapper.h>
+#include <AHT20_Wrapper.h>
 // #include <Analog_Wrapper.h>
 // #include <MPU6050_Wrapper.h>
 
