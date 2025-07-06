@@ -31,7 +31,11 @@ public:
 
 private:
     void setSampling();
-    Adafruit_BMP280 sensor; // Create an instance of the BMP280 sensor
+    Adafruit_BMP280 sensor;
     Data data;
-    const uint8_t numberOfUniqueData() const override { return 3; } // Number of data variables in data struct
+
+    // Define the field names for the BMP280 sensor data
+    static constexpr const char *FIELD_NAMES[] = {"Temperature", "Pressure", "Altitude"};
+    const char *const *namesOfData() const override { return FIELD_NAMES; }
+    const uint8_t numberOfUniqueData() const override { return sizeof(FIELD_NAMES) / sizeof(FIELD_NAMES[0]); }
 };

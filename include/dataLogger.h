@@ -12,7 +12,8 @@ public:
     virtual void createDataTypesHeader(File *dataFile);
 
 protected:
-    virtual const uint8_t numberOfUniqueData() const { return 0; }
+    virtual const uint8_t numberOfUniqueData() const = 0;
+    virtual const char *const *namesOfData() const = 0;
 };
 
 class DataLogger
@@ -23,7 +24,6 @@ public:
         internalSPI = mainSPI;
     }
     bool begin();
-    bool createNewLogFile(uint16_t index);
     void endRow();
     const void debugPrintCardInfo() const;
     File *openFile();
@@ -31,13 +31,16 @@ public:
     {
         return fileIsOpen;
     }
+    void addRowID() { dataRowID++; }
 
 private:
+    bool createNewLogFile(uint16_t index);
     uint16_t determineNewLogIndex();
     String filePath;
     SPIClass internalSPI;
     File dataFile;
     bool fileIsOpen = false;
+    uint32_t dataRowID = 0;
 
     String baseName = "/log_";
     String fileExtension = ".csv";

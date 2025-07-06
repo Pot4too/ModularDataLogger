@@ -60,18 +60,43 @@ const void BMP280_Wrapper::debugPrintData() const
 
 bool BMP280_Wrapper::logDataToSd(File *dataFile)
 {
+    if (!isValid())
+    {
+        DEBUG_PRINTLN("BMP280 sensor data is not valid, skipping logging.");
+        for (int i = 0; i < numberOfUniqueData(); i++)
+        {
+            dataFile->print("ERR");
+            if (i != numberOfUniqueData() - 1)
+                dataFile->print(",");
+        }
+        return false;
+    }
+    dataFile->print(data.temperature);
+    dataFile->print(",");
+    dataFile->print(data.pressure);
+    dataFile->print(",");
+    dataFile->print(data.altitude);
+    return true;
 }
 
 void BMP280_Wrapper::createNameHeader(File *dataFile)
 {
+    DEBUG_PRINTLN("Creating name header for " + String(getSensorName()) + " sensor.");
     for (int i = 0; i < numberOfUniqueData(); i++)
     {
-        dataFile->print("BMP280");
-        if (i != numberOfUniqueData())
+        dataFile->print(getSensorName());
+        if (i != numberOfUniqueData() - 1)
             dataFile->print(",");
     }
 }
 
 void BMP280_Wrapper::createDataTypesHeader(File *dataFile)
 {
+    DEBUG_PRINTLN("Creating data type header for " + String(getSensorName()) + " sensor.");
+    for (int i = 0; i < numberOfUniqueData(); i++)
+    {
+        dataFile->print(namesOfData()[i]);
+        if (i != numberOfUniqueData() - 1)
+            dataFile->print(",");
+    }
 }

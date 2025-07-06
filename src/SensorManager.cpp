@@ -9,6 +9,9 @@ bool SensorManager::beginAll()
     }
     DEBUG_PRINTLN("I2C Wire initialized successfully.");
 
+    beginSPI();
+    beginDataLogger();
+
     if (!beginAnalogSensors())
     {
         DEBUG_PRINTLN("Failed to initialize analog sensors.");
@@ -128,8 +131,10 @@ GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType 
     {
     case Config::I2CSensorType::BMP280:
         return new BMP280_Wrapper(i2cAddress, *mainWire);
+        break;
     case Config::I2CSensorType::AHT20:
         return new AHT20_Wrapper(i2cAddress, *mainWire);
+        break;
     case Config::I2CSensorType::MPU6050:
         DEBUG_PRINTLN("MPU6050 sensor type not implemented yet.");
         return nullptr;
@@ -141,4 +146,80 @@ GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType 
         return nullptr;
     }
     return nullptr;
+}
+
+void SensorManager::beginSPI()
+{
+    SPI.begin(Config::SPI_SCK_PIN, Config::SPI_MISO_PIN, Config::SPI_MOSI_PIN);
+    SPI.beginTransaction(SPISettings(Config::SPI_Frequency, MSBFIRST, SPI_MODE0));
+    DEBUG_PRINTLN("SPI initialized successfully.");
+    return;
+}
+bool SensorManager::beginDataLogger()
+{
+    dataLogger = new DataLogger(SPI);
+    if (!dataLogger->begin())
+    {
+        DEBUG_PRINTLN("Failed to initialize Data Logger.");
+        dataLoggerInitialized = false;
+        return false;
+    }
+    dataLoggerInitialized = true;
+    DEBUG_PRINTLN("Data Logger initialized successfully.");
+    return true;
+}
+
+bool SensorManager::logSensorsDataToSd()
+{
+    if (!dataLoggerInitialized)
+    {
+        DEBUG_PRINTLN("Data Logger is not initialized, cannot log data.");
+        return false;
+    }
+    File *dataFile = dataLogger->openFile();
+    if (dataFile == nullptr)
+    {
+        DEBUG_PRINTLN("Failed to open data file for logging.");
+        return false;
+    }
+
+    for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
+    {
+        if (i2cSensors[i] == nullptr)
+            continue;
+        if (!i2cSensors[i]->logDataToSd(dataFile))
+        {
+            DEBUG_PRINTLN("Failed to log data for sensor: " + String(i2cSensors[i]->getSensorName()));
+            continue;
+        }
+    }
+    dataLogger->endRow();
+    dataLogger->addRowID();
+    return true;
+}
+
+void SensorManager::createLogFileHeader()
+{
+    File *dataFile = dataLogger->openFile();
+    if (dataFile == nullptr)
+    {
+        DEBUG_PRINTLN("Failed to open data file for logging.");
+        return;
+    }
+    dataFile->print("Timestamp,");
+    for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
+    {
+        if (i2cSensors[i] == nullptr)
+            continue;
+        i2cSensors[i]->createNameHeader(dataFile);
+    }
+    dataLogger->endRow();
+    dataFile->print("ID,");
+    for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
+    {
+        if (i2cSensors[i] == nullptr)
+            continue;
+        i2cSensors[i]->createDataTypesHeader(dataFile);
+    }
+    dataLogger->endRow();
 }

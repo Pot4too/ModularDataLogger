@@ -47,18 +47,41 @@ const void AHT20_Wrapper::debugPrintData() const
 
 bool AHT20_Wrapper::logDataToSd(File *dataFile)
 {
+    if (!isValid())
+    {
+        DEBUG_PRINTLN("AHT20 sensor data is not valid, skipping logging.");
+        for (int i = 0; i < numberOfUniqueData(); i++)
+        {
+            dataFile->print("ERR");
+            if (i != numberOfUniqueData() - 1)
+                dataFile->print(",");
+        }
+        return false;
+    }
+    dataFile->print(data.temperature);
+    dataFile->print(",");
+    dataFile->print(data.humidity);
+    return true;
 }
 
 void AHT20_Wrapper::createNameHeader(File *dataFile)
 {
+    DEBUG_PRINTLN("Creating name header for " + String(getSensorName()) + " sensor.");
     for (int i = 0; i < numberOfUniqueData(); i++)
     {
-        dataFile->print("AHT20");
-        if (i != numberOfUniqueData())
+        dataFile->print(getSensorName());
+        if (i != numberOfUniqueData() - 1)
             dataFile->print(",");
     }
 }
 
 void AHT20_Wrapper::createDataTypesHeader(File *dataFile)
 {
+    DEBUG_PRINTLN("Creating data type header for " + String(getSensorName()) + " sensor.");
+    for (int i = 0; i < numberOfUniqueData(); i++)
+    {
+        dataFile->print(namesOfData()[i]);
+        if (i != numberOfUniqueData() - 1)
+            dataFile->print(",");
+    }
 }

@@ -25,6 +25,7 @@ public:
     Config::I2CSensorType getSensorType() const override { return Config::I2CSensorType::AHT20; }
     const void debugPrintData() const override;
 
+    // Implement the GenericSensorLogger interface
     bool logDataToSd(File *dataFile) override;
     void createNameHeader(File *dataFile) override;
     void createDataTypesHeader(File *dataFile) override;
@@ -32,5 +33,9 @@ public:
 private:
     AHT20 sensor;
     Data data;
-    const uint8_t numberOfUniqueData() const override { return 2; }
+
+    // Define the field names for the AHT20 sensor data
+    static constexpr const char *FIELD_NAMES[] = {"Temperature", "Humidity"};
+    const uint8_t numberOfUniqueData() const override { return sizeof(FIELD_NAMES) / sizeof(FIELD_NAMES[0]); }
+    const char *const *namesOfData() const override { return FIELD_NAMES; }
 };

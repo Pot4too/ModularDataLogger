@@ -9,6 +9,7 @@
 #include <AHT20_Wrapper.h>
 // #include <Analog_Wrapper.h>
 // #include <MPU6050_Wrapper.h>
+#include <dataLogger.h>
 
 class SensorManager
 {
@@ -19,6 +20,7 @@ public:
     {
         return *mainWire;
     }
+    bool logSensorsDataToSd();
     void testI2CSensors();
 
 private:
@@ -26,10 +28,15 @@ private:
     bool beginI2CSensors();
     bool updateAnalogSensors();
     bool updateI2CSensors();
+    void beginSPI();
+    bool beginDataLogger();
+    void createLogFileHeader();
 
     GenericI2CSensorBase *createSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress);
 
     TwoWire *mainWire = &Wire;
+    DataLogger *dataLogger;
+    bool dataLoggerInitialized = false;
 
     uint8_t numberOfInitializedI2CSensors = 0;
     GenericI2CSensorBase *i2cSensors[Config::maxI2CSensors] = {nullptr};
