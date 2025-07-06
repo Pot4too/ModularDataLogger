@@ -2,7 +2,7 @@
 
 bool DataLogger::begin()
 {
-    if (!SD.begin(Config::SD_CS_PIN, internalSPI, Config::SPI_Frequency))
+    if (!SD.begin(Config::SD_CS_PIN, internalSPI))
     {
         DEBUG_PRINTLN("SD card initialization failed!");
         return false;

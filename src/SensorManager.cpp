@@ -152,12 +152,13 @@ void SensorManager::beginSPI()
 {
     SPI.begin(Config::SPI_SCK_PIN, Config::SPI_MISO_PIN, Config::SPI_MOSI_PIN);
     SPI.beginTransaction(SPISettings(Config::SPI_Frequency, MSBFIRST, SPI_MODE0));
+    mainSPI = &SPI;
     DEBUG_PRINTLN("SPI initialized successfully.");
     return;
 }
 bool SensorManager::beginDataLogger()
 {
-    dataLogger = new DataLogger(SPI);
+    dataLogger = new DataLogger(*mainSPI);
     if (!dataLogger->begin())
     {
         DEBUG_PRINTLN("Failed to initialize Data Logger.");

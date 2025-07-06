@@ -37,6 +37,7 @@ private:
     TwoWire *mainWire = &Wire;
     DataLogger *dataLogger;
     bool dataLoggerInitialized = false;
+    SPIClass *mainSPI;
 
     uint8_t numberOfInitializedI2CSensors = 0;
     GenericI2CSensorBase *i2cSensors[Config::maxI2CSensors] = {nullptr};
