@@ -46,53 +46,34 @@ bool SensorManager::updateAll()
 bool SensorManager::beginI2CSensors()
 {
     DEBUG_PRINTLN("Starting I2C scanner");
-    for (uint8_t i = 0; i < 127; i++)
+    for (uint8_t i = 8; i < 120; i++)
     {
         mainWire->beginTransmission(i);
         if (!mainWire->endTransmission() == 0)
         {
-            DEBUG_PRINT("No device found at address 2x");
-            DEBUG_PRINTLN(i);
+            DEBUG_PRINTLN("No device found at address 0x" + String(i, HEX));
             continue;
         }
-        DEBUG_PRINT("Device found at address 2x");
-        DEBUG_PRINTLN(i);
-        for (int j = 0; j < Config::numberOfKnownI2CSensors; j++)
+        DEBUG_PRINTLN("Device found at address 0x" + String(i, HEX) + ", initializing sensor... ");
+        for (uint8_t j = 0; j < Config::numberOfKnownI2CSensors; j++)
         {
             if (i != Config::I2CSensorTable[j].address)
                 continue;
-            switch (Config::I2CSensorTable[j].type)
+            i2cSensors[numberOfInitializedI2CSensors] = createSensorInstance(Config::I2CSensorTable[j].type, Config::I2CSensorTable[j].address);
+            if (i2cSensors[numberOfInitializedI2CSensors] == nullptr)
             {
-            case Config::I2CSensorType::BMP280:
-                i2cSensors[numberOfInitializedI2CSensors] = new BMP280_Wrapper(Config::I2CSensorTable[j].address, *mainWire);
-                if (!i2cSensors[numberOfInitializedI2CSensors]->begin())
-                {
-                    DEBUG_PRINTLN("Failed to initialize BMP280 sensor at address 0x" + String(i, HEX));
-                    delete i2cSensors[numberOfInitializedI2CSensors];
-                    i2cSensors[numberOfInitializedI2CSensors] = nullptr;
-                    break;
-                }
-                numberOfInitializedI2CSensors++;
-                break;
-            case Config::I2CSensorType::AHT20:
-                i2cSensors[numberOfInitializedI2CSensors] = new AHT20_Wrapper(Config::I2CSensorTable[j].address, *mainWire);
-                if (!i2cSensors[numberOfInitializedI2CSensors]->begin())
-                {
-                    DEBUG_PRINTLN("Failed to initialize AHT20 sensor at address 0x" + String(i, HEX));
-                    delete i2cSensors[numberOfInitializedI2CSensors];
-                    i2cSensors[numberOfInitializedI2CSensors] = nullptr;
-                    break;
-                }
-                numberOfInitializedI2CSensors++;
-                break;
-
-            case Config::I2CSensorType::None:
-                DEBUG_PRINTLN("No sensor type defined for this address, skipping initialization.");
-                break;
-            default:
-                DEBUG_PRINTLN("Unknown I2C sensor type, skipping initialization.");
-                break;
+                DEBUG_PRINTLN("Failed to create sensor instance for address 0x" + String(i, HEX));
+                continue;
             }
+            DEBUG_PRINTLN("Sensor instance created for " + String(i2cSensors[numberOfInitializedI2CSensors]->getSensorName()) + " at address 0x" + String(i, HEX));
+            if (!i2cSensors[numberOfInitializedI2CSensors]->begin())
+            {
+                DEBUG_PRINTLN("Failed to initialize sensor at address 0x" + String(i, HEX));
+                delete i2cSensors[numberOfInitializedI2CSensors];
+                i2cSensors[numberOfInitializedI2CSensors] = nullptr;
+                continue;
+            }
+            numberOfInitializedI2CSensors++;
         }
     }
     return true;
@@ -139,4 +120,25 @@ bool SensorManager::beginAnalogSensors()
 bool SensorManager::updateAnalogSensors()
 {
     return true;
+}
+
+GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress)
+{
+    switch (type)
+    {
+    case Config::I2CSensorType::BMP280:
+        return new BMP280_Wrapper(i2cAddress, *mainWire);
+    case Config::I2CSensorType::AHT20:
+        return new AHT20_Wrapper(i2cAddress, *mainWire);
+    case Config::I2CSensorType::MPU6050:
+        DEBUG_PRINTLN("MPU6050 sensor type not implemented yet.");
+        return nullptr;
+    case Config::I2CSensorType::None:
+        DEBUG_PRINTLN("No sensor type defined for this address, skipping initialization.");
+        break;
+    default:
+        DEBUG_PRINTLN("Unknown I2C sensor type, cannot create instance.");
+        return nullptr;
+    }
+    return nullptr;
 }

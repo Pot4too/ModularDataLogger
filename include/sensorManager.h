@@ -2,6 +2,7 @@
 #include "config.h"
 #include "GenericSensorBase.h"
 #include <Wire.h>
+#include <string.h>
 
 //* Sensor wrappers
 #include "BMP280_Wrapper.h"
@@ -25,6 +26,8 @@ private:
     bool beginI2CSensors();
     bool updateAnalogSensors();
     bool updateI2CSensors();
+
+    GenericI2CSensorBase *createSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress);
 
     TwoWire *mainWire = &Wire;
 
