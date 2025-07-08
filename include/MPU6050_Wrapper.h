@@ -9,6 +9,8 @@ struct SensorData_MPU6050
     float temp;       // Temperature in °C
     bool valid;
 
+    // TODO: Make class prototype align with Generic class
+
     SensorData_MPU6050() : ax(NAN), ay(NAN), az(NAN), gx(NAN), gy(NAN), gz(NAN), temp(NAN), valid(false) {}
 };
 
