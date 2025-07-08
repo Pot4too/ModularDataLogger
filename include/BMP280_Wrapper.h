@@ -1,7 +1,18 @@
 #pragma once
+
+// #define LOCAL_DEBUG
+
 #include "config.h"
 #include "GenericSensorBase.h"
 #include <Adafruit_BMP280.h>
+
+#if defined(LOCAL_DEBUG) || defined(GLOBAL_DEBUG_OVERRIDE)
+#define LOCAL_DEBUG_PRINT DEBUG_PRINT
+#define LOCAL_DEBUG_PRINTLN DEBUG_PRINTLN
+#else
+#define LOCAL_DEBUG_PRINT(x)
+#define LOCAL_DEBUG_PRINTLN(x)
+#endif // DEBUG
 
 class BMP280_Wrapper : public GenericI2CSensorBase
 {

@@ -10,7 +10,6 @@ bool SensorManager::beginAll()
     DEBUG_PRINTLN("I2C Wire initialized successfully.");
 
     beginSPI();
-    beginDataLogger();
 
     if (!beginAnalogSensors())
     {
@@ -23,8 +22,11 @@ bool SensorManager::beginAll()
         DEBUG_PRINTLN("Failed to initialize I2C sensors.");
         return false;
     }
-
     DEBUG_PRINTLN("All Sensors initialized.");
+
+    if (beginDataLogger())
+        createLogFileHeader();
+
     return true;
 }
 
@@ -150,15 +152,21 @@ GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType 
 
 void SensorManager::beginSPI()
 {
-    SPI.begin(Config::SPI_SCK_PIN, Config::SPI_MISO_PIN, Config::SPI_MOSI_PIN);
-    SPI.beginTransaction(SPISettings(Config::SPI_Frequency, MSBFIRST, SPI_MODE0));
-    mainSPI = &SPI;
+    mainSPI.begin(Config::SPI_SCK_PIN, Config::SPI_MISO_PIN, Config::SPI_MOSI_PIN);
+    // mainSPI.beginTransaction(SPISettings(Config::SPI_Frequency, MSBFIRST, SPI_MODE0));
+    //  mainSPI = &SPI;
     DEBUG_PRINTLN("SPI initialized successfully.");
     return;
 }
 bool SensorManager::beginDataLogger()
 {
-    dataLogger = new DataLogger(*mainSPI);
+    dataLogger = new DataLogger(mainSPI);
+    if (dataLogger == nullptr)
+    {
+        DEBUG_PRINTLN("Failed to create Data Logger instance.");
+        dataLoggerInitialized = false;
+        return false;
+    }
     if (!dataLogger->begin())
     {
         DEBUG_PRINTLN("Failed to initialize Data Logger.");
@@ -184,6 +192,7 @@ bool SensorManager::logSensorsDataToSd()
         return false;
     }
 
+    dataLogger->writeRowID(dataFile);
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
         if (i2cSensors[i] == nullptr)
@@ -193,6 +202,8 @@ bool SensorManager::logSensorsDataToSd()
             DEBUG_PRINTLN("Failed to log data for sensor: " + String(i2cSensors[i]->getSensorName()));
             continue;
         }
+        if (i != numberOfInitializedI2CSensors - 1)
+            dataFile->print(",");
     }
     dataLogger->endRow();
     dataLogger->addRowID();
@@ -213,14 +224,18 @@ void SensorManager::createLogFileHeader()
         if (i2cSensors[i] == nullptr)
             continue;
         i2cSensors[i]->createNameHeader(dataFile);
+        if (i != numberOfInitializedI2CSensors - 1)
+            dataFile->print(",");
     }
-    dataLogger->endRow();
+    dataLogger->nextLine();
     dataFile->print("ID,");
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
         if (i2cSensors[i] == nullptr)
             continue;
         i2cSensors[i]->createDataTypesHeader(dataFile);
+        if (i != numberOfInitializedI2CSensors - 1)
+            dataFile->print(",");
     }
     dataLogger->endRow();
 }

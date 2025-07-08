@@ -3,6 +3,7 @@
 
 // comment out '#define DEBUG at the top of the config.h file' to disable debug mode
 #define DEBUG
+// #define GLOBAL_DEBUG_OVERRIDE
 
 namespace Config
 {

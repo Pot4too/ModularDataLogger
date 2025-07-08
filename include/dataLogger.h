@@ -1,6 +1,7 @@
 #pragma once
 #include "config.h"
 #include <SD.h>
+#include <FS.h>
 #include <SPI.h>
 #include <string.h>
 
@@ -32,6 +33,12 @@ public:
         return fileIsOpen;
     }
     void addRowID() { dataRowID++; }
+    void writeRowID(File *dataFile)
+    {
+        dataFile->print(dataRowID);
+        dataFile->print(",");
+    }
+    void nextLine();
 
 private:
     bool createNewLogFile(uint16_t index);

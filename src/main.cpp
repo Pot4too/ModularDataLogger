@@ -35,4 +35,12 @@ void loop()
         return;
     }
     sensorManager.testI2CSensors();
+    if (!sensorManager.logSensorsDataToSd())
+    {
+        DEBUG_PRINTLN("Failed to log sensor data to SD card.");
+    }
+    else
+    {
+        DEBUG_PRINTLN("Sensor data logged successfully.");
+    }
 }

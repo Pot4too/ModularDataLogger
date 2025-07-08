@@ -2,6 +2,7 @@
 
 bool DataLogger::begin()
 {
+    delay(100);
     if (!SD.begin(Config::SD_CS_PIN, internalSPI))
     {
         DEBUG_PRINTLN("SD card initialization failed!");
@@ -12,6 +13,9 @@ bool DataLogger::begin()
         DEBUG_PRINTLN("SD Card failed to create a new Log file!");
         return false;
     }
+    DEBUG_PRINTLN("SD card initialized successfully.");
+    debugPrintCardInfo();
+    DEBUG_PRINTLN("New log file created: " + filePath);
     return true;
 }
 
@@ -43,10 +47,9 @@ uint16_t DataLogger::determineNewLogIndex()
     uint16_t fileIndex = 0;
     do
     {
-        filename = baseName + String(fileIndex) + fileExtension;
-        fileIndex++;
+        filename = baseName + String(fileIndex++) + fileExtension;
     } while (SD.exists(filename));
-    return fileIndex;
+    return fileIndex - 1;
 }
 
 void DataLogger::endRow()
@@ -55,6 +58,12 @@ void DataLogger::endRow()
     file.println();
     file.close();
     fileIsOpen = false;
+}
+
+void DataLogger::nextLine()
+{
+    File file = *openFile();
+    file.println();
 }
 
 const void DataLogger::debugPrintCardInfo() const
