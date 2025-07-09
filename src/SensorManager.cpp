@@ -138,8 +138,8 @@ GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType 
         return new AHT20_Wrapper(i2cAddress, *mainWire);
         break;
     case Config::I2CSensorType::MPU6050:
-        DEBUG_PRINTLN("MPU6050 sensor type not implemented yet.");
-        return nullptr;
+        return new MPU6050_Wrapper(i2cAddress, *mainWire);
+        break;
     case Config::I2CSensorType::None:
         DEBUG_PRINTLN("No sensor type defined for this address, skipping initialization.");
         break;

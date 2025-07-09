@@ -7,7 +7,7 @@
 #pragma once
 
 // Local debug flag to enable/disable debug prints
-#define LOCAL_DEBUG
+// #define LOCAL_DEBUG
 
 // Include necessary headers
 #include <config.h>
@@ -16,8 +16,8 @@
 
 // Debug print macros
 #if defined(LOCAL_DEBUG) || defined(GLOBAL_DEBUG_OVERRIDE)
-#define LOCAL_DEBUG_PRINT DEBUG_PRINT
-#define LOCAL_DEBUG_PRINTLN DEBUG_PRINTLN
+#define LOCAL_DEBUG_PRINT(x) DEBUG_PRINT(x)
+#define LOCAL_DEBUG_PRINTLN(x) DEBUG_PRINTLN(x)
 #else
 #define LOCAL_DEBUG_PRINT(x)
 #define LOCAL_DEBUG_PRINTLN(x)
@@ -40,7 +40,6 @@ public:
         float aX, aY, aZ;  // Acceleration in m/s^2
         float gX, gY, gZ;  // Angular velocity in rad/s
         float temperature; // Temperature in °C
-        // SensorData_MPU6050() : aX(NAN), aY(NAN), aZ(NAN), gX(NAN), gY(NAN), gZ(NAN), temperature(NAN) {}
     };
 
     /**
