@@ -1,50 +1,112 @@
 #include <MPU6050_Wrapper.h>
 
-/**
- * @brief Initializes the MPU6050 sensor.
- *
- * @param address I2C address of the MPU6050 sensor, default is 0x68.
- * @return true if initialization is successful, false otherwise.
- * @param wire Reference to the TwoWire object for I2C communication.
- * @param sensor_id
- */
-bool MPU6050_Wrapper::begin(uint8_t address, TwoWire &wire, int32_t sensor_id = -1)
+MPU6050_Wrapper::MPU6050_Wrapper(uint8_t _address, TwoWire &_wire)
 {
-    if (!mpu.begin(address, &wire, sensor_id))
+    i2cAddress = _address;
+    wire = &_wire;
+}
+
+bool MPU6050_Wrapper::begin()
+{
+    if (!sensor.begin(i2cAddress, &wire, sensor_id))
         return false;
     setSenosorConfiguration();
     return true;
 }
 
-/**
- * @brief  Reads data from the MPU6050 sensor.
- *
- * @return SensorData_MPU6050 struct and validity check.
- */
-SensorData_MPU6050 MPU6050_Wrapper::read()
+bool MPU6050_Wrapper::update()
 {
-    SensorData_MPU6050 data;
     sensors_event_t _acceleration, _rotation, _temperature;
-    if (!mpu.getEvent(&_acceleration, &_rotation, &_temperature))
-        return data;
-    data.ax = _acceleration.acceleration.x; // Acceleration in m/s^2
-    data.ay = _acceleration.acceleration.y; // Acceleration in m/s^2
-    data.az = _acceleration.acceleration.z; // Acceleration in m/s^2
-    data.gx = _rotation.gyro.x;             // Angular velocity in rad/s
-    data.gy = _rotation.gyro.y;             // Angular velocity in rad/s
-    data.gz = _rotation.gyro.z;             // Angular velocity in rad/s
-    data.temp = _temperature.temperature;   // Temperature in °C
-    data.valid = true;                      // Mark data as valid
-    return data;
+    if (!sensor.getEvent(&_acceleration, &_rotation, &_temperature))
+        return false;
+    isValid_Bool = true;
+    data.aX = _acceleration.acceleration.x;
+    data.aY = _acceleration.acceleration.y;
+    data.aZ = _acceleration.acceleration.z;
+    data.gX = _rotation.gyro.x;
+    data.gY = _rotation.gyro.y;
+    data.gZ = _rotation.gyro.z;
+    data.temperature = _temperature.temperature;
+    return true;
 }
 
-/**
- * @brief Sets the configuration for the MPU6050 sensor.
- *
- */
+void MPU6050_Wrapper::debugPrintData() const
+{
+    LOCAL_DEBUG_PRINT("MPU6050 Sensor Data: ");
+    LOCAL_DEBUG_PRINT("Acceleration: ");
+    LOCAL_DEBUG_PRINT("X: ");
+    LOCAL_DEBUG_PRINT(data.aX);
+    LOCAL_DEBUG_PRINT(", Y: ");
+    LOCAL_DEBUG_PRINT(data.aY);
+    LOCAL_DEBUG_PRINT(", Z: ");
+    LOCAL_DEBUG_PRINT(data.aZ);
+    LOCAL_DEBUG_PRINT(" m/s^2, Angular Velocity: ");
+    LOCAL_DEBUG_PRINT("X: ");
+    LOCAL_DEBUG_PRINT(data.gX);
+    LOCAL_DEBUG_PRINT(", Y: ");
+    LOCAL_DEBUG_PRINT(data.gY);
+    LOCAL_DEBUG_PRINT(", Z: ");
+    LOCAL_DEBUG_PRINT(data.gZ);
+    LOCAL_DEBUG_PRINT(" rad/s, Temperature: ");
+    LOCAL_DEBUG_PRINT(data.temperature);
+    LOCAL_DEBUG_PRINTLN(" °C");
+}
+
+bool MPU6050_Wrapper::logDataToSd(File *dataFile)
+{
+    if (!isValid())
+    {
+        LOCAL_DEBUG_PRINTLN("MPU6050 sensor data is not valid, skipping logging.");
+        for (int i = 0; i < numberOfUniqueData(); i++)
+        {
+            dataFile->print("ERR");
+            if (i != numberOfUniqueData() - 1)
+                dataFile->print(",");
+        }
+        return false;
+    }
+
+    dataFile->print(data.aX);
+    dataFile->print(",");
+    dataFile->print(data.aY);
+    dataFile->print(",");
+    dataFile->print(data.aZ);
+    dataFile->print(",");
+    dataFile->print(data.gX);
+    dataFile->print(",");
+    dataFile->print(data.gY);
+    dataFile->print(",");
+    dataFile->print(data.gZ);
+    dataFile->print(",");
+    dataFile->println(data.temperature);
+    return true;
+}
+
+void MPU6050_Wrapper::createNameHeader(File *dataFile)
+{
+    LOCAL_DEBUG_PRINTLN("Creating name header for " + String(getSensorName()) + " sensor.");
+    for (int i = 0; i < int(numberOfUniqueData()); i++)
+    {
+        dataFile->print(getSensorName());
+        if (i != numberOfUniqueData() - 1)
+            dataFile->print(",");
+    }
+}
+
+void MPU6050_Wrapper::createDataTypesHeader(File *dataFile)
+{
+    LOCAL_DEBUG_PRINTLN("Creating data type header for " + String(getSensorName()) + " sensor.");
+    for (int i = 0; i < int(numberOfUniqueData()); i++)
+    {
+        dataFile->print(namesOfData()[i]);
+        if (i != numberOfUniqueData() - 1)
+            dataFile->print(",");
+    }
+}
+
 void MPU6050_Wrapper::setSenosorConfiguration()
 {
-    mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-    mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+    sensor.setAccelerometerRange(MPU6050_RANGE_8_G);
+    sensor.setGyroRange(MPU6050_RANGE_500_DEG);
+    sensor.setFilterBandwidth(MPU6050_BAND_21_HZ);
 }

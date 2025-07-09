@@ -37,9 +37,9 @@ public:
      */
     struct Data
     {
-        float ax, ay, az; // Acceleration in m/s^2
-        float gx, gy, gz; // Angular velocity in rad/s
-        float temp;       // Temperature in °C
+        float ax, ay, az;  // Acceleration in m/s^2
+        float gx, gy, gz;  // Angular velocity in rad/s
+        float temperature; // Temperature in °C
         SensorData_MPU6050() : ax(NAN), ay(NAN), az(NAN), gx(NAN), gy(NAN), gz(NAN), temp(NAN) {}
     };
 
