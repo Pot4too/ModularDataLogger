@@ -37,10 +37,10 @@ public:
      */
     struct Data
     {
-        float ax, ay, az;  // Acceleration in m/s^2
-        float gx, gy, gz;  // Angular velocity in rad/s
+        float aX, aY, aZ;  // Acceleration in m/s^2
+        float gX, gY, gZ;  // Angular velocity in rad/s
         float temperature; // Temperature in °C
-        SensorData_MPU6050() : ax(NAN), ay(NAN), az(NAN), gx(NAN), gy(NAN), gz(NAN), temp(NAN) {}
+        // SensorData_MPU6050() : aX(NAN), aY(NAN), aZ(NAN), gX(NAN), gY(NAN), gZ(NAN), temperature(NAN) {}
     };
 
     /**
@@ -58,7 +58,7 @@ public:
      *
      * @return true if initialization is successful, false otherwise.
      */
-    bool begin() ovverride;
+    bool begin() override;
 
     /**
      * @brief Updates the sensor data.
@@ -66,7 +66,7 @@ public:
      *
      * @return true if data is successfully updated, false otherwise.
      */
-    bool update() ovverride;
+    bool update() override;
 
     /**
      * @brief Gets the name of the sensor.
@@ -150,12 +150,12 @@ private:
      *
      * @return The number of unique data fields.
      */
-    const uint8_t numberOfUniqueData() const ovverride { return sizeof(FIELD_NAMES) / sizeof(FIELD_NAMES[0]); }
+    const uint8_t numberOfUniqueData() const override { return sizeof(FIELD_NAMES) / sizeof(FIELD_NAMES[0]); }
 
     /**
      * @brief Gets the names of the data fields for the MPU6050 sensor.
      *
      * @return Pointer to an array of field names.
      */
-    const char *const *namesOfData() const ovverride { return FIELD_NAMES; }
+    const char *const *namesOfData() const override { return FIELD_NAMES; }
 };

@@ -8,7 +8,7 @@ MPU6050_Wrapper::MPU6050_Wrapper(uint8_t _address, TwoWire &_wire)
 
 bool MPU6050_Wrapper::begin()
 {
-    if (!sensor.begin(i2cAddress, &wire, sensor_id))
+    if (!sensor.begin(i2cAddress, wire, sensorID))
         return false;
     setSenosorConfiguration();
     return true;
@@ -30,7 +30,7 @@ bool MPU6050_Wrapper::update()
     return true;
 }
 
-void MPU6050_Wrapper::debugPrintData() const
+const void MPU6050_Wrapper::debugPrintData() const
 {
     LOCAL_DEBUG_PRINT("MPU6050 Sensor Data: ");
     LOCAL_DEBUG_PRINT("Acceleration: ");
