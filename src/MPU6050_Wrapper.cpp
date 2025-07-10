@@ -78,7 +78,7 @@ bool MPU6050_Wrapper::logDataToSd(File *dataFile)
     dataFile->print(",");
     dataFile->print(data.gZ);
     dataFile->print(",");
-    dataFile->println(data.temperature);
+    dataFile->print(data.temperature);
     return true;
 }
 

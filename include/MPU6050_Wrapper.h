@@ -7,7 +7,7 @@
 #pragma once
 
 // Local debug flag to enable/disable debug prints
-// #define LOCAL_DEBUG
+#define LOCAL_DEBUG
 
 // Include necessary headers
 #include <config.h>
@@ -75,13 +75,6 @@ public:
     const char *getSensorName() const override { return "MPU6050"; }
 
     /**
-     * @brief Checks if the sensor data is valid.
-     *
-     * @return true if the sensor data is valid, false otherwise.
-     */
-    bool isValid() const { return isValid_Bool; }
-
-    /**
      * @brief Gets the data from the sensor.
      *
      * @return Pointer to the sensor data structure.
@@ -130,9 +123,6 @@ private:
     Adafruit_MPU6050 sensor;
     Data data; // Sensor data structure
 
-    uint8_t i2cAddress;        // I2C address of the sensor
-    TwoWire *wire;             // Pointer to the TwoWire object for I2C communication
-    bool isValid_Bool = false; // Flag to indicate if the sensor data is valid
     int32_t sensorID = -1;
 
     /**
