@@ -20,6 +20,7 @@ namespace Config
 
     //! Global definitions
     constexpr int SERIAL_BAUD_RATE = 115200;
+    constexpr int LOOP_DELAY_MS = 3000;
 
     //* SPI
     constexpr int SPI_MOSI_PIN = 23;

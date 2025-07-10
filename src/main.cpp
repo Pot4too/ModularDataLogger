@@ -1,16 +1,17 @@
 #include "config.h"
 #include "SensorManager.h"
-// #include "BMP280_Wrapper.h"
 
 SensorManager sensorManager;
-// Data *dataBMP280;
-// BMP280_Wrapper::Data testingData;
+
+uint64_t previousTime = 0;
 
 void setup()
 {
     Serial.begin(Config::SERIAL_BAUD_RATE);
     while (!Serial)
-        ; // Wait for serial port to connect. Needed for native USB port only
+    {
+        ;
+    }
 
     DEBUG_PRINTLN("DEBUG MODE IS ENABLED");
     DEBUG_PRINTLN("Starting Sensor Manager...");
@@ -22,25 +23,26 @@ void setup()
     }
 
     DEBUG_PRINTLN("Sensor Manager initialized successfully.");
-    // sensorManager.updateAll();
-    //  DEBUG_PRINTLN(testingData.temperature);
 }
 
 void loop()
 {
-    delay(3000);
-    if (!sensorManager.updateAll())
+    if (millis() > previousTime + Config::LOOP_DELAY_MS)
     {
-        DEBUG_PRINTLN("Sensor Manager update failed.");
-        return;
-    }
-    sensorManager.testI2CSensors();
-    if (!sensorManager.logSensorsDataToSd())
-    {
-        DEBUG_PRINTLN("Failed to log sensor data to SD card.");
-    }
-    else
-    {
-        DEBUG_PRINTLN("Sensor data logged successfully.");
+        if (!sensorManager.updateAll())
+        {
+            DEBUG_PRINTLN("Sensor Manager update failed.");
+            return;
+        }
+        sensorManager.testI2CSensors();
+        if (!sensorManager.logSensorsDataToSd())
+        {
+            DEBUG_PRINTLN("Failed to log sensor data to SD card.");
+        }
+        else
+        {
+            DEBUG_PRINTLN("Sensor data logged successfully.");
+        }
+        previousTime = millis();
     }
 }

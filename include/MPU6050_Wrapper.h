@@ -7,7 +7,7 @@
 #pragma once
 
 // Local debug flag to enable/disable debug prints
-#define LOCAL_DEBUG
+// #define LOCAL_DEBUG
 
 // Include necessary headers
 #include <config.h>
