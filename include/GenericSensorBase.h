@@ -24,4 +24,17 @@ protected:
 class GenericAnalogSensorBase : public GenericSensorLogger
 {
 public:
+    virtual bool update() = 0;
+    virtual bool begin() = 0;
+    virtual const char *getSensorName() const = 0;
+    virtual const void *getData() const = 0;
+    virtual Config::AnalogSensorType getSensorType() const { return Config::AnalogSensorType::None; }
+    virtual ~GenericAnalogSensorBase() {};
+    virtual const void debugPrintData() const;
+
+protected:
+    bool isDataValid = false;
+    uint8_t pin = 0;
+    float data = 0.0f;
+    virtual bool isSensorPresent() { return (analogRead(pin) * (3.3 / 4095.0)) < 0.1 ? true : false; }
 };
