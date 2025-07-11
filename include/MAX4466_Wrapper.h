@@ -29,3 +29,24 @@
 #define LOCAL_DEBUG_PRINT(x)
 #define LOCAL_DEBUG_PRINTLN(x)
 #endif // DEBUG
+
+class MAX4466_Wrapper : public GenericAnalogSensorBase
+{
+public:
+    MAX4466_Wrapper(uint8_t _pin) { pin = _pin; }
+
+    bool begin() override;
+    bool update() override;
+
+    const char *getSensorName() const override { return "MAX4466"; }
+    const void *getData() const override { return &data; }
+    Config::AnalogSensorType getSensorType() const override { return Config::AnalogSensorType::MAX4466; }
+
+    bool logDataToSd(File *dataFile) override;
+    void createNameHeader(File *dataFile) override;
+    void createDataTypesHeader(File *dataFile) override;
+
+    const void debugPrintData() const override;
+
+private:
+};

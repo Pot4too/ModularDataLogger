@@ -36,5 +36,5 @@ protected:
     bool isDataValid = false;
     uint8_t pin = 0;
     float data = 0.0f;
-    virtual bool isSensorPresent() { return (analogRead(pin) * (3.3 / 4095.0)) < 0.1 ? true : false; }
+    bool isSensorPresent() { return (analogRead(pin) * (3.3 / 4095.0)) < 0.1 ? true : false; }
 };
