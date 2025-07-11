@@ -16,7 +16,6 @@
 //! Includes
 #include <config.h>
 #include <GenericSensorBase.h>
-#include <Adafruit_MAX4466.h>
 
 // Local debug flag to enable/disable debug prints
 // #define LOCAL_DEBUG
@@ -49,4 +48,7 @@ public:
     const void debugPrintData() const override;
 
 private:
+    static constexpr const char *FIELD_NAMES[] = {"Analog Sound"};
+    const uint8_t numberOfUniqueData() const override { return sizeof(FIELD_NAMES) / sizeof(FIELD_NAMES[0]); }
+    const char *const *namesOfData() const override { return FIELD_NAMES; }
 };

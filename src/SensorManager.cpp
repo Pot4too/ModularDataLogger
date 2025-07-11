@@ -64,7 +64,7 @@ bool SensorManager::beginI2CSensors()
         {
             if (i != Config::I2CSensorTable[j].address)
                 continue;
-            i2cSensors[numberOfInitializedI2CSensors] = createSensorInstance(Config::I2CSensorTable[j].type, Config::I2CSensorTable[j].address);
+            i2cSensors[numberOfInitializedI2CSensors] = createI2CSensorInstance(Config::I2CSensorTable[j].type, Config::I2CSensorTable[j].address);
             if (i2cSensors[numberOfInitializedI2CSensors] == nullptr)
             {
                 DEBUG_PRINTLN("Failed to create sensor instance for address 0x" + String(i, HEX));
@@ -119,15 +119,46 @@ void SensorManager::testI2CSensors()
 
 bool SensorManager::beginAnalogSensors()
 {
+    DEBUG_PRINTLN("Starting Analog sensors initialization.");
+    for (uint8_t i = 0; i < Config::AnalogSensorCount; i++)
+    {
+        if (Config::AnalogSensorTable[i].type == Config::AnalogSensorType::None)
+            continue;
+        analogSensors[numberOfInitializedAnalogSensors] = createAnalogSensorInstance(Config::AnalogSensorTable[i].type, Config::AnalogSensorTable[i].pin);
+        if (analogSensors[numberOfInitializedAnalogSensors] == nullptr)
+        {
+            DEBUG_PRINTLN("Failed to create analog sensor instance for pin " + String(Config::AnalogSensorTable[i].pin));
+            continue;
+        }
+        if (!analogSensors[numberOfInitializedAnalogSensors]->begin())
+        {
+            DEBUG_PRINTLN("Failed to initialize analog sensor on pin " + String(Config::AnalogSensorTable[i].pin));
+            delete analogSensors[numberOfInitializedAnalogSensors];
+            analogSensors[numberOfInitializedAnalogSensors] = nullptr;
+            continue;
+        }
+        DEBUG_PRINTLN("Analog sensor initialized on pin " + String(Config::AnalogSensorTable[i].pin));
+        numberOfInitializedAnalogSensors++;
+    }
     return true;
 }
 
 bool SensorManager::updateAnalogSensors()
 {
+    for (uint8_t i = 0; i < numberOfInitializedAnalogSensors; i++)
+    {
+        if (analogSensors[i] == nullptr)
+            continue;
+        if (!analogSensors[i]->update())
+        {
+            DEBUG_PRINTLN("Failed to update analog sensor: " + String(analogSensors[i]->getSensorName()));
+            continue;
+        }
+    }
     return true;
 }
 
-GenericI2CSensorBase *SensorManager::createSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress)
+GenericI2CSensorBase *SensorManager::createI2CSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress)
 {
     switch (type)
     {
@@ -238,4 +269,27 @@ void SensorManager::createLogFileHeader()
             dataFile->print(",");
     }
     dataLogger->endRow();
+}
+
+GenericAnalogSensorBase *SensorManager::createAnalogSensorInstance(Config::AnalogSensorType _type, uint8_t _pin)
+{
+    switch (_type)
+    {
+    case Config::AnalogSensorType::MAX4466:
+        return new MAX4466_Wrapper(_pin);
+        break;
+    case Config::AnalogSensorType::CapacitiveMoisture:
+        DEBUG_PRINTLN("Capacitive Moisture sensor is not implemented yet.");
+        return nullptr;
+    case Config::AnalogSensorType::MQ135:
+        DEBUG_PRINTLN("MQ135 sensor is not implemented yet.");
+        return nullptr;
+    case Config::AnalogSensorType::Generic:
+        DEBUG_PRINTLN("Generic analog sensor is not implemented yet.");
+        return nullptr;
+    default:
+        DEBUG_PRINTLN("Unknown analog sensor type, cannot create instance.");
+        return nullptr;
+    }
+    return nullptr;
 }

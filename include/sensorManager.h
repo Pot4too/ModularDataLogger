@@ -9,6 +9,7 @@
 #include "BMP280_Wrapper.h"
 #include <AHT20_Wrapper.h>
 #include <MPU6050_Wrapper.h>
+#include <MAX4466_Wrapper.h>
 
 //* Data Logger
 #include <dataLogger.h>
@@ -31,7 +32,8 @@ private:
     bool beginDataLogger();
     void createLogFileHeader();
 
-    GenericI2CSensorBase *createSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress);
+    GenericI2CSensorBase *createI2CSensorInstance(Config::I2CSensorType type, uint8_t i2cAddress);
+    GenericAnalogSensorBase *createAnalogSensorInstance(Config::AnalogSensorType type, uint8_t pin);
 
     TwoWire *mainWire = &Wire;
     DataLogger *dataLogger;
@@ -40,4 +42,7 @@ private:
 
     uint8_t numberOfInitializedI2CSensors = 0;
     GenericI2CSensorBase *i2cSensors[Config::maxI2CSensors] = {nullptr};
+
+    uint8_t numberOfInitializedAnalogSensors = 0;
+    GenericAnalogSensorBase *analogSensors[Config::AnalogSensorCount] = {nullptr};
 };
