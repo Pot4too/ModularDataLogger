@@ -51,5 +51,5 @@ void MAX4466_Wrapper::createNameHeader(File *dataFile)
 void MAX4466_Wrapper::createDataTypesHeader(File *dataFile)
 {
     LOCAL_DEBUG_PRINTLN("Creating data type header for " + String(getSensorName()) + " sensor.");
-    dataFile->print(*namesOfData());
+    dataFile->print(*namesOfData()[0]);
 }
