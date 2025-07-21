@@ -224,6 +224,7 @@ bool SensorManager::logSensorsDataToSd()
     }
 
     dataLogger->writeRowID(dataFile);
+    // Log I2C Sensors data
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
         if (i2cSensors[i] == nullptr)
@@ -236,8 +237,24 @@ bool SensorManager::logSensorsDataToSd()
         if (i != numberOfInitializedI2CSensors - 1)
             dataFile->print(",");
     }
+
+    dataFile->print(",");
+
+    // Log Analog sensors data
+    for (int i = 0; i < AnalogSensorCount; i++)
+    {
+        if (analogSensors[i] == nullptr)
+            continue;
+        if (!analogSensors[i]->logDataToSd(dataFile))
+        {
+            DEBUG_PRINTLN("Failed to log data for sensor: " + String(analogSensors[i]->getSensorName()));
+            continue;
+        }
+        if (i != AnalogSensorCount - 1)
+            dataFile->print(",");
+    }
     dataLogger->endRow();
-    dataLogger->addRowID();
+    dataLogger->addRowID(); // rowID++
     return true;
 }
 
@@ -250,6 +267,8 @@ void SensorManager::createLogFileHeader()
         return;
     }
     dataFile->print("Timestamp,");
+
+    // Create a Sensor type header I2C sensors
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
         if (i2cSensors[i] == nullptr)
@@ -258,14 +277,36 @@ void SensorManager::createLogFileHeader()
         if (i != numberOfInitializedI2CSensors - 1)
             dataFile->print(",");
     }
+    dataFile->print(",");
+    // Create a sensor type header Analog sensors
+    for (uint8_t i = 0; i < AnalogSensorCount; i++)
+    {
+        if (analogSensors[i] == nullptr)
+            continue;
+        analogSensors[i]->createNameHeader(dataFile);
+        if (i != AnalogSensorCount)
+            dataFile->print(",");
+    }
     dataLogger->nextLine();
     dataFile->print("ID,");
+
+    // Data type header for I2C sensors
     for (uint8_t i = 0; i < numberOfInitializedI2CSensors; i++)
     {
         if (i2cSensors[i] == nullptr)
             continue;
         i2cSensors[i]->createDataTypesHeader(dataFile);
         if (i != numberOfInitializedI2CSensors - 1)
+            dataFile->print(",");
+    }
+
+    // Data type header for analog sensors
+    for (uint8_t i = 0; i < AnalogSensorCount; i++)
+    {
+        if (analogSensors[i] == nullptr)
+            continue;
+        analogSensors[i]->createDataTypesHeader(dataFile);
+        if (i != AnalogSensorCount)
             dataFile->print(",");
     }
     dataLogger->endRow();
