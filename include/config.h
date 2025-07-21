@@ -59,8 +59,8 @@ namespace Config
      * to the system. Each sensor is represented by an instance of the AnalogSensor structure.
      */
     constexpr AnalogSensor AnalogSensorTable[] = {
-        {36, AnalogSensorType::CapacitiveMoisture},
-        {39, AnalogSensorType::MAX4466},
+        {35, AnalogSensorType::CapacitiveMoisture},
+        {34, AnalogSensorType::MAX4466},
         {0, AnalogSensorType::None},
         {0, AnalogSensorType::None},
         {0, AnalogSensorType::None}};

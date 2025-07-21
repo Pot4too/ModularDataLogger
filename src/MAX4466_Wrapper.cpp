@@ -2,7 +2,9 @@
 
 bool MAX4466_Wrapper::begin()
 {
-    isDataValid = isSensorPresent();
+    // isDataValid = isSensorPresent();
+    isDataValid = true;
+    DEBUG_PRINTLN("Is Analog Sensor data Valid? " + String(isDataValid));
     if (!isDataValid)
     {
         LOCAL_DEBUG_PRINTLN("MAX4466 sensor not present on pin " + String(pin));
@@ -51,5 +53,5 @@ void MAX4466_Wrapper::createNameHeader(File *dataFile)
 void MAX4466_Wrapper::createDataTypesHeader(File *dataFile)
 {
     LOCAL_DEBUG_PRINTLN("Creating data type header for " + String(getSensorName()) + " sensor.");
-    dataFile->print(*namesOfData()[0]);
+    dataFile->print(namesOfData()[0]);
 }

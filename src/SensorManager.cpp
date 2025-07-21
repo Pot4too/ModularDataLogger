@@ -124,6 +124,7 @@ bool SensorManager::beginAnalogSensors()
     {
         if (Config::AnalogSensorTable[i].type == Config::AnalogSensorType::None)
             continue;
+        pinMode(Config::AnalogSensorTable[i].pin, INPUT);
         analogSensors[numberOfInitializedAnalogSensors] = createAnalogSensorInstance(Config::AnalogSensorTable[i].type, Config::AnalogSensorTable[i].pin);
         if (analogSensors[numberOfInitializedAnalogSensors] == nullptr)
         {
@@ -299,7 +300,8 @@ void SensorManager::createLogFileHeader()
         if (i != numberOfInitializedI2CSensors - 1)
             dataFile->print(",");
     }
-
+    dataFile->print(",");
+    
     // Data type header for analog sensors
     for (uint8_t i = 0; i < Config::AnalogSensorCount; i++)
     {
