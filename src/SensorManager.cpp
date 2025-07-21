@@ -241,7 +241,7 @@ bool SensorManager::logSensorsDataToSd()
     dataFile->print(",");
 
     // Log Analog sensors data
-    for (int i = 0; i < AnalogSensorCount; i++)
+    for (int i = 0; i < Config::AnalogSensorCount; i++)
     {
         if (analogSensors[i] == nullptr)
             continue;
@@ -250,7 +250,7 @@ bool SensorManager::logSensorsDataToSd()
             DEBUG_PRINTLN("Failed to log data for sensor: " + String(analogSensors[i]->getSensorName()));
             continue;
         }
-        if (i != AnalogSensorCount - 1)
+        if (i != Config::AnalogSensorCount - 1)
             dataFile->print(",");
     }
     dataLogger->endRow();
@@ -279,12 +279,12 @@ void SensorManager::createLogFileHeader()
     }
     dataFile->print(",");
     // Create a sensor type header Analog sensors
-    for (uint8_t i = 0; i < AnalogSensorCount; i++)
+    for (uint8_t i = 0; i < Config::AnalogSensorCount; i++)
     {
         if (analogSensors[i] == nullptr)
             continue;
         analogSensors[i]->createNameHeader(dataFile);
-        if (i != AnalogSensorCount)
+        if (i != Config::AnalogSensorCount)
             dataFile->print(",");
     }
     dataLogger->nextLine();
@@ -301,12 +301,12 @@ void SensorManager::createLogFileHeader()
     }
 
     // Data type header for analog sensors
-    for (uint8_t i = 0; i < AnalogSensorCount; i++)
+    for (uint8_t i = 0; i < Config::AnalogSensorCount; i++)
     {
         if (analogSensors[i] == nullptr)
             continue;
         analogSensors[i]->createDataTypesHeader(dataFile);
-        if (i != AnalogSensorCount)
+        if (i != Config::AnalogSensorCount)
             dataFile->print(",");
     }
     dataLogger->endRow();
