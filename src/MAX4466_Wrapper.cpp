@@ -2,8 +2,7 @@
 
 bool MAX4466_Wrapper::begin()
 {
-    // isDataValid = isSensorPresent();
-    isDataValid = true;
+    isDataValid = isSensorPresent();
     DEBUG_PRINTLN("Is Analog Sensor data Valid? " + String(isDataValid));
     if (!isDataValid)
     {
